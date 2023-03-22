@@ -15,6 +15,7 @@ router.post("/addNewUserData", async (req, res) => {
     user_phone: req.bodyuser_phone,
     user_social_ids: req.body.user_social_ids,
     user_career_status: req.body.user_career_status,
+    token: req.body.token,
   });
 
   try {
@@ -44,6 +45,15 @@ router.get("/getUserbyid/:id", async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 });
+//Get by email ID Method
+router.get("/getUserbyemail/:emailId", async (req, res) => {
+  try {
+    const data = await Model.find({ email_id: req.params.emailId });
+    res.json(data);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
 
 //Update by ID Method
 router.patch("/userUpdate/:id", async (req, res) => {
@@ -53,6 +63,21 @@ router.patch("/userUpdate/:id", async (req, res) => {
     const options = { new: true };
 
     const result = await Model.findByIdAndUpdate(id, updatedData, options);
+
+    res.send(result);
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+});
+
+//Update by EMAIL Method
+router.patch("/userUpdatebyemail/:email", async (req, res) => {
+  try {
+    const email = req.params.email;
+    const updatedData = req.body;
+    const options = { new: true };
+
+    const result = await Model.findOneAndUpdate(email, updatedData, options);
 
     res.send(result);
   } catch (error) {

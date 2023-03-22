@@ -1,65 +1,56 @@
-const Model = require("../models/authModal");
+const Model = require("../models/userModel");
+// const Modeluser = require("../models/userModel");
 const express = require("express");
 const router = express.Router();
+const jwt = require("jsonwebtoken");
+const { json } = require("body-parser");
 module.exports = router;
 
-// Post Method
-router.post("/addAuth", async (req, res) => {
-  const data = new Model({
-    username:req.body.username,
-      password: req.body.password
-  });
-
+//login
+router.post("/login", async (req, res) => {
+  const { email_id, password } = req.body;
   try {
-    const dataToSave = await data.save();
-    res.status(200).json(dataToSave);
+    const user = await Model.findOne({ email_id: email_id });
+    if (user) {
+      //generate and access token
+      const accessToken = jwt.sign(
+        { id: user._id, userRole: user.user_role },
+        "secrecgKey"
+      );
+      console.log(accessTokens);
+      res.json({
+        username: user.email_id,
+        accessToken: accessToken,
+      });
+    }
   } catch (error) {
-    res.status(400).json({ message: error.message });
+    console.log(error);
   }
 });
+// res.json(user);
+// if (user) {
+//   const accesstoken = jwt.sign(
+//     { id: user.id, username: user.username },
+//     "mysecrestKys13ha"
+//   );
+//   //screate to should from env
+//   res.json(user);
+// } else {
+//   res.status(404).json("incorrect user data");
+// }
 
-//Get all Method
-router.get("/getAllAuthData", async (req, res) => {
-  try {
-    const data = await Model.find();
-    res.json(data);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
+//middleware to veryfy token
+const verifyUser = (req, res) => {
+  const authHeader = req.headers.authorization;
+  if (authHeader) {
+    jwt.verify(token, "seckertKey", (err, user) => {
+      if (err) {
+        return res.status(403).json("Token is not valid ");
+      }
+      req.user = user;
+      next();
+    });
+  } else {
+    res.status(404).json("incorrect ");
   }
-});
-
-//Get by ID Method
-router.get("/getAuthbyid/:id", async (req, res) => {
-  try {
-    const data = await Model.findById(req.params.id);
-    res.json(data);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-});
-
-//Update by ID Method
-router.patch("/updateAuth/:id", async (req, res) => {
-  try {
-    const id = req.params.id;
-    const updatedData = req.body;
-    const options = { new: true };
-
-    const result = await Model.findByIdAndUpdate(id, updatedData, options);
-
-    res.send(result);
-  } catch (error) {
-    res.status(400).json({ message: error.message });
-  }
-});
-
-//Delete by ID Method
-router.delete("/deleteUser/:id", async (req, res) => {
-  try {
-    const id = req.params.id;
-    const data = await Model.findByIdAndDelete(id);
-    res.send(`Document with ${data.name} has been deleted..`);
-  } catch (error) {
-    res.status(400).json({ message: error.message });
-  }
-});
+};

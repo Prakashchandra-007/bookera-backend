@@ -6,17 +6,16 @@ module.exports = router;
 // Post Method
 router.post("/addNewChapter", async (req, res) => {
   const data = new Model({
-   
-  book_id: req.body.book_id,
-  slug: req.body.slug,
-  name:req.body.name,
-  description: req.body.description,
-  priority: req.body.priority,
-  created_at: req.body.created_at,
-  updated_at: req.body.updated_at,
-  created_by:req.body.created_by,
-  updated_by: req.body.updated_by,
-  restricted:req.body.restricted,
+    book_id: req.body.book_id,
+    slug: req.body.slug,
+    name: req.body.name,
+    description: req.body.description,
+    priority: req.body.priority,
+    created_at: req.body.created_at,
+    updated_at: req.body.updated_at,
+    created_by: req.body.created_by,
+    updated_by: req.body.updated_by,
+    restricted: req.body.restricted,
   });
 
   try {
@@ -36,7 +35,14 @@ router.get("/getAllChapters", async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 });
-
+router.get("/getAllChaptersbyBook/:id", async (req, res) => {
+  try {
+    const data = await Model.find({book_id:req.params.id});
+    res.json(data);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
 //Get by ID Method
 router.get("/getChapterbyid/:id", async (req, res) => {
   try {

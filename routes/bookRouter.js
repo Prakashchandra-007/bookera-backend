@@ -1,15 +1,37 @@
 const Model = require("../models/BookModal");
 const express = require("express");
 const router = express.Router();
+// const multer = require("multer");
+// const { v4: uuidv4 } = require("uuid");
 module.exports = router;
-
+// const storage = multer.diskStorage({
+//   destination: function (req, file, cb) {
+//     cb(null, "./uploads/");
+//   },
+//   filename: function (req, file, cb) {
+//     cb(null, file.originalname);
+//   },
+// });
+// const fileFilter = (req, file, cb) => {
+//   if (file.mimetype === "image/jpeg" || file.mimetype === "image/png") {
+//     cb(null, true);
+//   } else {
+//     cb(null, false);
+//   }
+// };
+// const upload = multer({
+//   storage: storage,
+//   limits: { fileSize: 1024 * 1024 * 5 },
+//   fileFilter: fileFilter,
+// });
 // Post Method
 router.post("/postBook", async (req, res) => {
+  console.log("req.body", req.body);
   const data = new Model({
     title: req.body.title,
     description: req.body.description,
     category: req.body.category,
-    image_id: req.body.image_id,
+    image: req.body.image,
     avg_rating: req.body.avg_rating,
     author: req.body.author,
     createdAt: req.body.createdAt,

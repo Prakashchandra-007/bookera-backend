@@ -19,6 +19,7 @@ const chapterData = new mongoose.Schema({
   },
   priority: {
     type: String,
+    default: "",
   },
   created_at: {
     type: Date,
