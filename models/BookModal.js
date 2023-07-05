@@ -21,6 +21,7 @@ const bookSchema = new mongoose.Schema({
     default: new Date(+new Date() + 7 * 24 * 60 * 60 * 1000),
     required: true,
   },
+
   tags: { type: Array, default: [] },
   recommendation_to: { type: Array, default: [] },
 });

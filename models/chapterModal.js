@@ -13,6 +13,10 @@ const chapterData = new mongoose.Schema({
     type: String,
     default: "",
   },
+  html_content_text: {
+    type: String,
+    default: "",
+  },
   description: {
     type: String,
     default: "",

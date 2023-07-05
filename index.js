@@ -10,6 +10,7 @@ const tagRouter = require("./routes/tagsRouter");
 const userRoleRouter = require("./routes/userRoleRouter");
 const roleRouter = require("./routes/roleRouter");
 const upload = require("./routes/imageUploadRouter");
+const courseEnrollRouter = require("./routes/courseEnrollRouter");
 const ngrok = require("ngrok");
 var bodyParser = require("body-parser");
 const Grid = require("gridfs-stream");
@@ -42,9 +43,9 @@ app.use(express.json());
 app.listen(5000, () => {
   console.log(`Server Started at ${5000}`);
 });
-ngrok.connect(2000, () => {
-  console.log("public");
-});
+// ngrok.connect(2000, () => {
+//   console.log("public");
+// });
 
 app.get("/file/:filename", async (req, res) => {
   try {
@@ -76,4 +77,5 @@ app.use("/api", imageRouter);
 app.use("/api", tagRouter);
 app.use("/api", userRoleRouter);
 app.use("/api", roleRouter);
+app.use("/api", courseEnrollRouter);
 app.use("/file", upload);

@@ -9,6 +9,7 @@ router.post("/addNewChapter", async (req, res) => {
     book_id: req.body.book_id,
     slug: req.body.slug,
     name: req.body.name,
+    html_content_text: req.body.html_content_text,
     description: req.body.description,
     priority: req.body.priority,
     created_at: req.body.created_at,
@@ -37,7 +38,7 @@ router.get("/getAllChapters", async (req, res) => {
 });
 router.get("/getAllChaptersbyBook/:id", async (req, res) => {
   try {
-    const data = await Model.find({book_id:req.params.id});
+    const data = await Model.find({ book_id: req.params.id });
     res.json(data);
   } catch (error) {
     res.status(500).json({ message: error.message });

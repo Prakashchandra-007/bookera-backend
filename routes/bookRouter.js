@@ -1,5 +1,5 @@
-const Model = require("../models/BookModal");
 const express = require("express");
+const Model = require("../models/BookModal");
 const router = express.Router();
 // const multer = require("multer");
 // const { v4: uuidv4 } = require("uuid");
@@ -34,6 +34,7 @@ router.post("/postBook", async (req, res) => {
     image: req.body.image,
     avg_rating: req.body.avg_rating,
     author: req.body.author,
+    chapters: req.body.chapters,
     createdAt: req.body.createdAt,
     tags: req.body.tags,
     recommended_to: req.body.recommended_to,
