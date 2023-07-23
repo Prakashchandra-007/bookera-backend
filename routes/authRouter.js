@@ -77,7 +77,11 @@ router.post("/register", async (req, res) => {
     await newUser.save();
     // Token expires in 1 hour
     const token = jwt.sign({ email_id }, secretKey, { expiresIn: "1h" });
-    res.status(201).json({ message: "User registered successfully", token });
+    res.status(201).json({
+      userRegistered: true,
+      message: "User registered successfully",
+      token,
+    });
     // res.status(201).json({ message: "User registered successfully" });
   } catch (error) {
     res.status(500).json({ message: "Error registering user" });
@@ -106,7 +110,11 @@ router.post("/login", passport.authenticate("local"), async (req, res) => {
     });
 
     // Respond with the token and other data as needed
-    res.json({ message: "User logged in successfully", token });
+    res.json({
+      isLogined: true,
+      message: "User logged in successfully",
+      token,
+    });
   } catch (error) {
     console.error("Error fetching role:", error);
     res.status(500).json({ message: "Error fetching role" });
@@ -250,7 +258,6 @@ router.patch("/change-password", authenticateToken, async (req, res) => {
     const hashedNewPassword = await bcrypt.hash(newPassword, 10);
     user.password = hashedNewPassword;
     await user.save();
-
     res.json({ message: "Password changed successfully" });
   } catch (error) {
     console.error("Error changing password:", error);
