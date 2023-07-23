@@ -1,69 +1,84 @@
-const Model = require("../models/rolesModals");
+// routes/roles.js
+
 const express = require("express");
 const router = express.Router();
+const Role = require("../models/roleModal");
+const {
+  checkPermission,
+  PermissionError,
+} = require("../middlewares/permissionMiddleware");
+
+// Route to create a new role (requires admin permission)
+router.post("/roles", checkPermission("canCreateRoles"), async (req, res) => {
+  try {
+    const { name, permissions } = req.body;
+    const role = new Role({ name, permissions });
+    await role.save();
+    res.json({ message: "Role created successfully", role });
+  } catch (error) {
+    if (error instanceof PermissionError) {
+      return res.status(403).json({ message: "Permission denied" });
+    }
+    console.error("Error creating role:", error);
+    res.status(500).json({ message: "Error creating role" });
+  }
+});
+
+// Route to update a role (requires admin permission)
+router.patch(
+  "/roles/:roleId",
+  checkPermission("canEditRoles"),
+  async (req, res) => {
+    try {
+      const { roleId } = req.params;
+      const { name, permissions } = req.body;
+      const role = await Role.findByIdAndUpdate(
+        roleId,
+        { name, permissions },
+        { new: true }
+      );
+      res.json({ message: "Role updated successfully", role });
+    } catch (error) {
+      if (error instanceof PermissionError) {
+        return res.status(403).json({ message: "Permission denied" });
+      }
+      console.error("Error updating role:", error);
+      res.status(500).json({ message: "Error updating role" });
+    }
+  }
+);
+
+// Route to delete a role (requires admin permission)
+router.delete(
+  "/roles/:roleId",
+  checkPermission("canDeleteRoles"),
+  async (req, res) => {
+    try {
+      const { roleId } = req.params;
+      await Role.findByIdAndDelete(roleId);
+      res.json({ message: "Role deleted successfully" });
+    } catch (error) {
+      if (error instanceof PermissionError) {
+        return res.status(403).json({ message: "Permission denied" });
+      }
+      console.error("Error deleting role:", error);
+      res.status(500).json({ message: "Error deleting role" });
+    }
+  }
+);
+
+// Route to get the list of all roles (requires admin permission)
+router.get("/roles", checkPermission("canViewRoles"), async (req, res) => {
+  try {
+    const roles = await Role.find();
+    res.json({ roles });
+  } catch (error) {
+    if (error instanceof PermissionError) {
+      return res.status(403).json({ message: "Permission denied" });
+    }
+    console.error("Error fetching roles:", error);
+    res.status(500).json({ message: "Error fetching roles" });
+  }
+});
+
 module.exports = router;
-
-// Post Method
-router.post("/addNewRole", async (req, res) => {
-  const data = new Model({
-    name: req.body.name,
-    display_name: req.body.display_name,
-    description: req.body.description,
-
-    created_at: req.body.created_at,
-    updated_at: req.body.updated_at,
-  });
-
-  try {
-    const dataToSave = await data.save();
-    res.status(200).json(dataToSave);
-  } catch (error) {
-    res.status(400).json({ message: error.message });
-  }
-});
-
-//Get all Method
-router.get("/getAllRoles", async (req, res) => {
-  try {
-    const data = await Model.find();
-    res.json(data);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-});
-
-//Get by ID Method
-router.get("/getRolesByid/:id", async (req, res) => {
-  try {
-    const data = await Model.findById(req.params.id);
-    res.json(data);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-});
-
-//Update by ID Method
-router.patch("/updateRole/:id", async (req, res) => {
-  try {
-    const id = req.params.id;
-    const updatedData = req.body;
-    const options = { new: true };
-
-    const result = await Model.findByIdAndUpdate(id, updatedData, options);
-
-    res.send(result);
-  } catch (error) {
-    res.status(400).json({ message: error.message });
-  }
-});
-
-//Delete by ID Method
-router.delete("/deleteRole/:id", async (req, res) => {
-  try {
-    const id = req.params.id;
-    const data = await Model.findByIdAndDelete(id);
-    res.send(`Document with ${data.name} has been deleted..`);
-  } catch (error) {
-    res.status(400).json({ message: error.message });
-  }
-});
