@@ -11,6 +11,7 @@ const roleRouter = require("./routes/roleRouter");
 const upload = require("./routes/imageUploadRouter");
 const courseEnrollRouter = require("./routes/courseEnrollRouter");
 const authRouter = require("./routes/authRouter");
+const purchasedBooks = require("./routes/purchasedBooksRouter");
 const ngrok = require("ngrok");
 const bodyParser = require("body-parser");
 const Grid = require("gridfs-stream");
@@ -66,7 +67,6 @@ passport.use(
   new LocalStrategy(
     { usernameField: "email_id" },
     (email_id, password, done) => {
-      console.log("?????????", email_id);
       User.findOne({ email_id })
         .then((user) => {
           if (!user) {
@@ -76,7 +76,7 @@ passport.use(
             if (err) {
               return done(err);
             }
-
+            console.log(result, ">>>>>>>>>>>>>", user);
             if (result) {
               return done(null, user);
             } else {
@@ -136,3 +136,4 @@ app.use("/api", tagRouter);
 app.use("/api", roleRouter);
 app.use("/api", courseEnrollRouter);
 app.use("/file", upload);
+app.use("/api/purchasedBooks", purchasedBooks);
