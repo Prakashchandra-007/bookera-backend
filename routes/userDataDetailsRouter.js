@@ -2,13 +2,11 @@ const Model = require("../models/userModel");
 const express = require("express");
 const router = express.Router();
 module.exports = router;
-console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>", Model);
 // Post Method
 router.post("/postDataConsumption", async (req, res) => {
   const data = new Model({
-    
-    user_id:req.body.user_id,
-    content_id:req.body.content_id,
+    user_id: req.body.user_id,
+    content_id: req.body.content_id,
   });
 
   try {
