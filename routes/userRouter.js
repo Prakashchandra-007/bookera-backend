@@ -101,7 +101,6 @@ router.delete("/deleteUser/:id", async (req, res) => {
 router.patch("/profile/settings", authenticateToken, (req, res) => {
   const userEmail = req.user.email_id;
   // Check if the user exists in the database
-  console.log(userEmail);
   Model.findOne({ email_id: userEmail })
     .then((user) => {
       if (!user) {

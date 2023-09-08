@@ -76,7 +76,6 @@ passport.use(
             if (err) {
               return done(err);
             }
-            console.log(result, ">>>>>>>>>>>>>", user);
             if (result) {
               return done(null, user);
             } else {
@@ -107,7 +106,6 @@ app.get("/file/:filename", async (req, res) => {
     const file = await gfs.files.findOne({ filename: req.params.filename });
     res.send(readStream);
     const readStream = gfs.createReadStream(file.filename, file);
-    console.log(readStream);
     readStream.pipe(res);
   } catch (error) {
     res.send("not found");

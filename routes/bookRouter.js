@@ -26,7 +26,6 @@ module.exports = router;
 // });
 // Post Method
 router.post("/postBook", async (req, res) => {
-  console.log("req.body", req.body);
   const data = new Model({
     title: req.body.title,
     description: req.body.description,

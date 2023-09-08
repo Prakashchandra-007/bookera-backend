@@ -39,12 +39,10 @@ router.post("/makePurchase", async (req, res) => {
     });
 
     const dataToSave = await newPurchase.save();
-    res
-      .status(201)
-      .json({ message: "Successfully created a purchase record", dataToSave });
+    res.status(201).json({ success: true, dataToSave });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: "Failed to create a purchase" });
+    res.status(500).json({ success: false, error: err });
   }
 });
 

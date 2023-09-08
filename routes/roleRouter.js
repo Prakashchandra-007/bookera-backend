@@ -81,4 +81,16 @@ router.get("/roles", checkPermission("canViewRoles"), async (req, res) => {
   }
 });
 
+// get element by id
+router.get("/role/:roleId", async (req, res) => {
+  const roleId = req.params.roleId;
+  try {
+    const role = await Role.findById(roleId);
+    res.json({ data: role, status: true });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "role not found", status: false });
+  }
+});
+
 module.exports = router;

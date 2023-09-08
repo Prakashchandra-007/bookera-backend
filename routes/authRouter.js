@@ -203,7 +203,6 @@ router.post("/forgot-password", async (req, res) => {
       console.error("Error finding user:", error);
       return null; // Return null or any other value to indicate user not found
     });
-    console.log(user);
     if (!user) {
       // Return success message even if the user doesn't exist to avoid email enumeration
       return res.json({ message: "Password reset link sent to your email" });
