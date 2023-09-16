@@ -89,36 +89,92 @@ router.post("/register", async (req, res) => {
 });
 
 // User login
-router.post("/login", passport.authenticate("local"), async (req, res) => {
-  // User authenticated successfully
-  try {
-    // Get the user's email and role ID from req.user
-    const { email_id, role } = req.user;
+// router.post("/login", passport.authenticate("local"), async (req, res) => {
+//   // User authenticated successfully
+//   try {
+//     // Get the user's email and role ID from req.user
+//     const { email_id, role } = req.user;
 
-    // Fetch the role details using the role ID
-    const roleDetails = await Role.findById(role);
-    if (!roleDetails) {
-      return res.status(404).json({ message: "Role not found" });
+//     // Fetch the role details using the role ID
+//     const roleDetails = await Role.findById(role);
+//     if (!roleDetails) {
+//       return res.status(404).json({ message: "Role not found" });
+//     }
+
+//     // Extract the necessary role information from roleDetails (e.g., permissions)
+//     const { permissions, name } = roleDetails;
+
+//     // Token expires in 1 hour
+//     const token = jwt.sign({ email_id, role: name, permissions }, secretKey, {
+//       expiresIn: "1h",
+//     });
+
+//     // Respond with the token and other data as needed
+//     res.json({
+//       isLogined: true,
+//       message: "User logged in successfully",
+//       token,
+//     });
+//   } catch (error) {
+//     console.error("Error fetching role:", error);
+//     res.status(500).json({ message: "Error fetching role" });
+//   }
+// });
+
+router.post("/login", (req, res, next) => {
+  passport.authenticate("local", (err, user, info) => {
+    if (err) {
+      // Server error
+      console.error("Error during authentication:", err);
+      return res
+        .status(500)
+        .json({ message: "Server error during authentication" });
     }
+    if (!user) {
+      // Incorrect credentials
+      return res
+        .status(401)
+        .json({ message: "Incorrect username or password" });
+    }
+    req.login(user, (err) => {
+      if (err) {
+        console.error("Error during login:", err);
+        return res.status(500).json({ message: "Server error during login" });
+      }
+      try {
+        // Get the user's email and role ID from req.user
+        const { email_id, role } = req.user;
 
-    // Extract the necessary role information from roleDetails (e.g., permissions)
-    const { permissions, name } = roleDetails;
+        // Fetch the role details using the role ID
+        const roleDetails = Role.findById(role);
+        if (!roleDetails) {
+          return res.status(404).json({ message: "Role not found" });
+        }
 
-    // Token expires in 1 hour
-    const token = jwt.sign({ email_id, role: name, permissions }, secretKey, {
-      expiresIn: "1h",
+        // Extract the necessary role information from roleDetails (e.g., permissions)
+        const { permissions, name } = roleDetails;
+
+        // Token expires in 1 hour
+        const token = jwt.sign(
+          { email_id, role: name, permissions },
+          secretKey,
+          {
+            expiresIn: "1h",
+          }
+        );
+
+        // Respond with the token and other data as needed
+        res.json({
+          isLogined: true,
+          message: "User logged in successfully",
+          token,
+        });
+      } catch (error) {
+        console.error("Error fetching role:", error);
+        res.status(500).json({ message: "Error fetching role" });
+      }
     });
-
-    // Respond with the token and other data as needed
-    res.json({
-      isLogined: true,
-      message: "User logged in successfully",
-      token,
-    });
-  } catch (error) {
-    console.error("Error fetching role:", error);
-    res.status(500).json({ message: "Error fetching role" });
-  }
+  })(req, res, next);
 });
 
 // Route for requesting password reset
