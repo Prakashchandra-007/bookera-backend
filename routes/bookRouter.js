@@ -3,28 +3,17 @@ const Model = require("../models/BookModal");
 const router = express.Router();
 // const multer = require("multer");
 // const { v4: uuidv4 } = require("uuid");
+const PublishStatus = {
+  DRAFT: "draft",
+  PUBLISHED: "published",
+  ARCHIVED: "archived",
+};
+// Draft: The book is still being worked on or is not ready for public consumption. It's in a preliminary or incomplete state.
+// Published: The book is available to readers and is actively promoted. Readers can access and read the content of the book.
+// Archived: The book has been removed from public view, taken out of circulation, or is no longer actively promoted. It may be considered  no longer relevant. Readers typically cannot access or find the book in the same way as published books.
 module.exports = router;
-// const storage = multer.diskStorage({
-//   destination: function (req, file, cb) {
-//     cb(null, "./uploads/");
-//   },
-//   filename: function (req, file, cb) {
-//     cb(null, file.originalname);
-//   },
-// });
-// const fileFilter = (req, file, cb) => {
-//   if (file.mimetype === "image/jpeg" || file.mimetype === "image/png") {
-//     cb(null, true);
-//   } else {
-//     cb(null, false);
-//   }
-// };
-// const upload = multer({
-//   storage: storage,
-//   limits: { fileSize: 1024 * 1024 * 5 },
-//   fileFilter: fileFilter,
-// });
-// Post Method
+
+// Post create book Method
 router.post("/postBook", async (req, res) => {
   const data = new Model({
     title: req.body.title,
@@ -47,7 +36,7 @@ router.post("/postBook", async (req, res) => {
   }
 });
 
-//Get all Method
+//Get all books Method
 router.get("/getAllBook", async (req, res) => {
   try {
     const data = await Model.find();
@@ -57,7 +46,7 @@ router.get("/getAllBook", async (req, res) => {
   }
 });
 
-//Get by ID Method
+//Get book by ID Method
 router.get("/getBookbyid/:id", async (req, res) => {
   try {
     const data = await Model.findById(req.params.id);
@@ -67,7 +56,7 @@ router.get("/getBookbyid/:id", async (req, res) => {
   }
 });
 
-//Update by ID Method
+//Update book by ID Method
 router.patch("/updateBook/:id", async (req, res) => {
   try {
     const id = req.params.id;
@@ -82,12 +71,67 @@ router.patch("/updateBook/:id", async (req, res) => {
   }
 });
 
-//Delete by ID Method
+//hard Delete books by ID Method
 router.delete("/deleteBook/:id", async (req, res) => {
   try {
     const id = req.params.id;
     const data = await Model.findByIdAndDelete(id);
     res.send(`Document with ${data.name} has been deleted..`);
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+});
+// Get all published books
+router.get("/getAllPublishedBooks", async (req, res) => {
+  try {
+    const publishedBooks = await Model.find({ publishStatus: "published" });
+    res.json(publishedBooks);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// Update publishStatus of a book by ID
+router.patch("/updatePublishStatus/:id", async (req, res) => {
+  try {
+    const id = req.params.id;
+    const newPublishStatus = req.body.publishStatus;
+    // Validate that the newPublishStatus is one of the allowed values (draft, published, archived)
+    if (!Object.values(PublishStatus).includes(newPublishStatus)) {
+      return res.status(400).json({ message: "Invalid publishStatus value." });
+    }
+
+    const options = { new: true };
+
+    const updatedBook = await Model.findByIdAndUpdate(
+      id,
+      { publishStatus: newPublishStatus },
+      options
+    );
+
+    res.json(updatedBook);
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+});
+
+// Soft delete a book by ID
+router.patch("/softDeleteBook/:id", async (req, res) => {
+  try {
+    const id = req.params.id;
+
+    // Find the book by ID and update the deleted field to true
+    const updatedBook = await Model.findByIdAndUpdate(
+      id,
+      { deleted: true },
+      { new: true }
+    );
+
+    if (!updatedBook) {
+      return res.status(404).json({ message: "Book not found." });
+    }
+
+    res.json(updatedBook);
   } catch (error) {
     res.status(400).json({ message: error.message });
   }
