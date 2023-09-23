@@ -30,9 +30,15 @@ router.post("/postBook", async (req, res) => {
 
   try {
     const dataToSave = await data.save();
-    res.status(200).json(dataToSave);
+    res.status(201).json({ status: true, data: dataToSave }); // 201 Created
   } catch (error) {
-    res.status(400).json({ message: error.message });
+    if (res.statusCode > 500) {
+      res
+        .status(res.statusCode)
+        .json({ status: false, message: "Server error" });
+    } else {
+      res.status(400).json({ status: false, message: error.message }); // 400 Bad Request
+    }
   }
 });
 
