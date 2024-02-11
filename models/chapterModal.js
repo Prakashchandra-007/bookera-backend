@@ -54,16 +54,20 @@ const chapterSchema = new mongoose.Schema({
   },
   created_at: {
     type: Date,
-    default: new Date(+new Date() + 7 * 24 * 60 * 60 * 1000),
+    default: new Date(),
   },
   updated_at: {
     type: Date,
-    default: new Date(+new Date() + 7 * 24 * 60 * 60 * 1000),
+    default: new Date(),
   },
   created_by: { type: String, default: null },
   updated_by: { type: String, default: null },
   restricted: { type: Array, default: [] },
   chapterData: chapterDataSchema,
+  chapterNumber: {
+    type: Number,
+    default: null,
+  },
 });
 
 module.exports = mongoose.model("chapterData", chapterSchema);

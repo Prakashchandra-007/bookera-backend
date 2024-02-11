@@ -28,7 +28,7 @@ const bookSchema = new mongoose.Schema({
   author: { type: String, default: "" },
   createdAt: {
     type: String,
-    default: new Date(+new Date() + 7 * 24 * 60 * 60 * 1000),
+    default: new Date(),
     required: true,
   },
 
