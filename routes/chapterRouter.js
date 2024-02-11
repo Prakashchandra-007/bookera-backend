@@ -39,7 +39,8 @@ router.post("/addNewChapter", async (req, res) => {
     created_by,
     updated_by,
     restricted,
-    chapterData, // Assuming this is the new property containing chapter content
+    chapterData,
+    chapterNumber,
   } = req.body;
 
   try {
@@ -55,6 +56,7 @@ router.post("/addNewChapter", async (req, res) => {
       created_by,
       updated_by,
       restricted,
+      chapterNumber,
       chapterData, // Assigning the chapterData property
     });
 
@@ -96,8 +98,7 @@ router.get("/getChapterbyid/:id", async (req, res) => {
 router.patch("/updateChapter/:id", async (req, res) => {
   try {
     const id = req.params.id;
-    const updatedData = req.body;
-
+    let updatedData = req.body;
     // Check if chapterData is included in the request body
     if (updatedData.chapterData) {
       // If included, set chapterData property separately
